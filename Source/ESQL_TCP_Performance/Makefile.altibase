@@ -1,0 +1,17 @@
+include $(ALTIBASE_HOME)/install/altibase_env.mk
+
+BINS=sh
+SRCS=sh.sc
+
+APRES=$(SRCS:.sc=.cpp)
+OBJS=$(SRCS:.cpp=.$(OBJEXT))
+
+%.cpp : %.sc
+	apre -t cpp $^
+
+sh: sh.$(OBJEXT)
+	$(LD) $(LFLAGS) $(LDOUT)$@$(BINEXT) $^ $(LIBOPT)apre$(LIBAFT) $(LIBOPT)odbccli$(LIBAFT) $(LIBS)
+
+clean:
+	$(Q) $(RM) $(BINS) $(BINS2) $(APRES) *.$(OBJEXT) core *.d
+

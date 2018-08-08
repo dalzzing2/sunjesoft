@@ -1,0 +1,38 @@
+TARGET          = sh
+
+CC              = gcc
+PROC            = proc
+LIB             = -L$(ORACLE_HOME)/lib -lclntsh -lpthread -ldl -lm -lrt -lodbc
+MYINC           = include/
+PROCINC         = include=$(ORACLE_HOME)/precomp/public/ include=$(ORACLE_HOME)/rdbms/demo/ \
+        include=$(ORACLE_HOME)/rdbms/public/ \
+        include=$(ORACLE_HOME)/network/public/
+CINC            = -I$(ORACLE_HOME)/precomp/public/ -I$(ORACLE_HOME)/rdbms/demo/ \
+        -I$(ORACLE_HOME)/rdbms/public/ -I$(ORACLE_HOME)/network/public/
+
+ORA_OPT         = THREADS=YES PARSE=NONE MODE=ANSI CLOSE_ON_COMMIT=NO
+CC_OPT          =
+
+OBJECT          = sh.o
+ORA_GARBAGE     = *.dcl *.cod *.cud *.lis
+
+######## implicit rules
+.SUFFIXES: .pc .c
+
+.pc.c:
+		$(PROC) $(ORA_OPT) $(PROINC) INCLUDE=$(MYINC) $*
+.c.o:
+		$(CC) -c -o $*.o $*.c -I $(MYINC) $(CINC)
+
+####### build rules
+
+all:            $(TARGET)
+
+$(TARGET):      $(OBJECT)
+        $(CC) -o $(TARGET) $(OBJECT) $(LIB)
+
+sh.c: sh.pc
+sh.o: sh.c
+
+clean:
+		rm -f $(TARGET) $(TARGET).c $(OBJECT) $(ORA_GARBAGE)
