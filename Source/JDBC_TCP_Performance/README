@@ -1,0 +1,44 @@
+##############################################
+# 폴더 구조
+##############################################
+conf : JDBC CONNECTION 에 필요한 정보를 설정하는 폴더
+  README.json  : json 샘플
+  sunje.json   : json 실제 설정
+
+java : 소스를 컴파일 및 구동하는데 필요한 jdk 가 있는 폴더
+
+jar  : json 과 log 를 기록하는 라이브러리를 담고있는 jar 파일이 있는 폴더
+
+sql  : 테이블 생성 및 제거 쿼리를 담는 폴더
+  createTable.sql  : 테이블 생성
+  dropTable.sql    : 테이블 제거
+
+iperf : 네트워크 속도를 측정하는 프로그램
+  http://mozi.tistory.com/51
+  
+##############################################
+# 프로그램 실행 방법
+##############################################
+
+##############################################
+# FOR GOLDILOKCS
+##############################################
+1. 테이블 생성
+  SHELL> gsql ID PW -i ./sql/createTable.sql
+
+2. 환경변수 설정
+  SHELL> source env.sh
+
+3. 컴파일
+  SHELL> make
+
+4. conf/sunje.json 파일 수정
+
+5. 자바프로그램 수행 ( Select 는 구동방식이 다르므로 주의 )
+  Select, Insert, Update, Delete )
+    SHELL> java Main (Session_Count) (Row_Count) (s,i,u,d)
+
+  예) java Main 10 10000 s
+      : 10 개의 세션이 10000 개의 데이터를 select 한다.
+  예) java Main 10 10000 i
+      : 10 개의 세션이 각각 1000개의 데이터씩 총 10000 건을 insert 한다.

@@ -1,0 +1,11 @@
+{
+	"Mode"		  : "D" or "T",    // DA Mode : D, TCP Mode : T
+	"JDBCDriver"  : "sunje.goldilocks.jdbc.GoldilocksDriver", // Class Driver
+	"JDBCUrl_DA"  : "jdbc:goldilocks://0.0.0.0:0/test", // Mode D URL
+	"JDBCUrl_TCP" : "jdbc:goldilocks://127.0.0.1:22581/test", // Mode T URL
+	"User"		  : "TEST", // User Name
+	"Password"	  : "test", // User Password
+    "AutoCommit"  : "F", // AutoCommit Off : F, AutoCommit On : T
+	"Commit"	  : 1   // Commit Interval When AutoCommit value is F
+}
+

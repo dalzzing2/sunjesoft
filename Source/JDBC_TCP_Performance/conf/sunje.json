@@ -1,0 +1,10 @@
+{
+	"Mode"        : "T",
+	"JDBCDriver"  : "sunje.goldilocks.jdbc.GoldilocksDriver",
+	"JDBCUrl_DA"  : "jdbc:goldilocks://0.0.0.0:0/test",
+	"JDBCUrl_TCP" : "jdbc:goldilocks://127.0.0.1:22581/test",
+	"User"        : "TEST",
+	"Password"    : "test",
+	"AutoCommit"  : "F",
+	"Commit"      : "1"
+}
