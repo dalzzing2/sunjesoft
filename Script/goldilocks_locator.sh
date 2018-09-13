@@ -28,7 +28,7 @@ function check_file
   Logging "${info}" "========================================================"
   if [[ -f ${odbc} ]]
   then
-    odbc2="${odbc}_${dat}_tmp"
+    odbc2="${odbc}_${dat}_goldilocks"
     Logging "${info}" "'${odbc}' exists. ${odbc2} created."
     odbc=${odbc2}
     touch ${odbc}
@@ -49,7 +49,7 @@ function check_file
 
   if [[ -f ${loca} ]]
   then
-    loca2="${loca}_${dat}_tmp"
+    loca2="${loca}_${dat}_goldilocks"
     Logging "${info}" "'${loca}' exists. ${loca2} created."
     loca=${loca2}
     touch ${loca}

@@ -4,7 +4,7 @@ goldilocks_locator.sh 알고리즘
  - 설정되어 있지 않은 경우 $HOME 경로에 .odbc.ini 파일 생성
  - 설정되어 있는 경우 설정된 경로에 .odbc.ini 파일 생성
 2. 홈디렉토리에 .locator.ini 파일이 있는지 확인
-3. 1단계, 2단계의 파일생성시 이미 파일이 존재하는 경우 `date`_tmp 의 스냇샵 파일을 생성
+3. 1단계, 2단계의 파일생성시 이미 파일이 존재하는 경우 `date`_goldilocks 의 스냇샵 파일을 생성
 4. .odbc.ini 파일에 GOLDILOCKS DSN 작성
  - 입력값 서버 아이피, 리스너 포트
  - 쓰기 실패하는 경우 프로그램 종료
