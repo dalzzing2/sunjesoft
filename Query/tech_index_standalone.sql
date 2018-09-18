@@ -1,3 +1,25 @@
+--######################################################################################
+-- View For Index (StandAlone)
+--
+-- OWNER            : Owner
+-- TAB_SCHEMA       : Schema Name
+-- TAB_NAME         : Table Name
+-- IDX_NAME         : Index Name
+-- LOC_USE_MBYTE    : MegaByte Used By Index In Local
+-- TBS_NAME         : TableSpace Name stored Index
+-- LOC_TBS_USE_PERC : Tablespace Percentage Used By Index
+-- CLU_USE_MBYTE    : MegaByte Used By Index In Cluster
+--
+--gSQL> SELECT * FROM TECH_INDEX;
+--
+--OWNER TAB_SCHEMA TAB_NAME            IDX_NAME                              LOC_USE_MBYTE TBS_NAME     LOC_TBS_USE_PERC CLU_USE_MBYTE
+------- ---------- ------------------- ------------------------------------- ------------- ------------ ---------------- -------------
+--TEST  PUBLIC     CYCLONE_SLAVE_STATE CYCLONE_SLAVE_STATE_PRIMARY_KEY_INDEX          0.50 MEM_TEMP_TBS             1.56          0.50
+--TEST  PUBLIC     PF_TEST             PF_TEST_PRIMARY_KEY_INDEX                      0.75 MEM_TEMP_TBS             2.34          0.75
+--TEST  PUBLIC     T1                  T1_PRIMARY_KEY_INDEX                           0.50 MEM_TEMP_TBS             1.56          0.50
+--TEST  PUBLIC     T2                  T2_PRIMARY_KEY_INDEX                           0.50 MEM_TEMP_TBS             1.56          0.50
+--######################################################################################
+
 DROP VIEW IF EXISTS PERFORMANCE_VIEW_SCHEMA.TECH_INDEX;
 
 CREATE VIEW PERFORMANCE_VIEW_SCHEMA.TECH_INDEX
