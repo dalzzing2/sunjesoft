@@ -1,4 +1,3 @@
-$ cat gloader.sh
 #!/bin/sh
 
 function Print_Table_From_Database(){
