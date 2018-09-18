@@ -1,3 +1,27 @@
+--######################################################################################
+-- View For Cluster
+-- G_ID           : Group Identifier
+-- M_ID           : Member Identifier
+-- M_POS          : Member Position
+-- NAME           : Member Name
+-- STATUS         : Cluster Connection Status
+-- G_COORD        : Global Coordinator
+-- D_COORD        : Domain Coordinator
+-- GLOBAL_SCN     : Global SCN
+-- LOCAL_SCN      : Local SCN
+-- AGABLE_SCN     : Local Ager SCN
+-- AGABLE_SCN_GAP : Local Ager SCN Gap
+-- IP             : Member IP
+-- PORT           : Member PORT
+--
+--gSQL> SELECT * FROM TECH_CLUSTER;
+--
+--G_ID M_ID M_POS NAME STATUS G_COORD D_COORD GLOBAL_SCN LOCAL_SCN  AGABLE_SCN AGABLE_SCN_GAP IP            PORT
+------ ---- ----- ---- ------ ------- ------- ---------- ---------- ---------- -------------- ------------ -----
+--   1    1     0 G1N1 ACTIVE FALSE   TRUE    748.0.316  748.0.330  748.0.330  0.0.0          192.168.0.50 10000
+--   2    2     1 G2N1 ACTIVE TRUE    TRUE    748.0.1253 748.0.1264 748.0.1264 0.0.0          192.168.0.50 20000
+--######################################################################################
+
 DROP VIEW IF EXISTS PERFORMANCE_VIEW_SCHEMA.TECH_CLUSTER;
 
 CREATE VIEW PERFORMANCE_VIEW_SCHEMA.TECH_CLUSTER
