@@ -1,7 +1,7 @@
 --######################################################################################
 -- View For PSA
 --
--- MEMBER_NAME      : Member Name
+-- MEMBER_NAME    : Cluster Member Name
 -- ID             : Session Identifier
 -- SERIAL         : Session Serial
 -- PROGRAM        : Program Name
