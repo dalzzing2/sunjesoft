@@ -1,8 +1,24 @@
+--######################################################################################
+-- View For Unused Column
+--
+-- OWNER        : Owner
+-- SCHEMA_NAME  : Schema Name
+-- TABLE_NAME   : Table Name
+-- COLUMN_ID    : Column Identifier
+-- IS_UNUSED    : Unused Status
+--
+--gSQL> SELECT * FROM TECH_UNUSED_COL;
+--
+--OWNER SCHEMA_NAME TABLE_NAME COLUMN_ID IS_UNUSED
+------- ----------- ---------- --------- ---------
+--TEST  PUBLIC      T1            102861 TRUE     
+--######################################################################################
+
 DROP VIEW IF EXISTS PERFORMANCE_VIEW_SCHEMA.TECH_UNUSED_COL;
 
 CREATE VIEW PERFORMANCE_VIEW_SCHEMA.TECH_UNUSED_COL
 (
-  USER_NAME,
+  OWNER,
   SCHEMA_NAME,
   TABLE_NAME,
   COLUMN_ID,
@@ -10,7 +26,7 @@ CREATE VIEW PERFORMANCE_VIEW_SCHEMA.TECH_UNUSED_COL
 )
 AS  
 SELECT
-  AU.AUTHORIZATION_NAME USER_NAME,
+  AU.AUTHORIZATION_NAME OWNER,
   SC.SCHEMA_NAME SCHEMA_NAME,
   WT.TABLE_NAME TABLE_NAME,
   WH.COLUMN_ID COLUMN_ID,
@@ -21,6 +37,7 @@ FROM
   DEFINITION_SCHEMA.SCHEMATA SC,
   AUTHORIZATIONS AU
 WHERE
+  1 = 1 AND
   WH.IS_UNUSED = 'TRUE' AND
   WH.OWNER_ID = WT.OWNER_ID AND
   WH.SCHEMA_ID = WT.SCHEMA_ID AND
