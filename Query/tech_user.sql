@@ -1,3 +1,22 @@
+--######################################################################################
+-- View For User
+--
+-- MEMBER_NAME      : Member Name
+-- USER_NAME        : User Name
+-- LOCK_STATUS      : Lock Status
+-- TABLESPACE_TYPE  : Tablespace Type
+-- TABLESPACE_NAME  : Tablespace Name
+--
+--gSQL> SELECT * FROM TECH_USER;
+--
+--MEMBER_NAME USER_NAME LOCK_STATUS TABLESPACE_TYPE TABLESPACE_NAME
+------------- --------- ----------- --------------- ---------------
+--STANDALONE  SYS       OPEN        DATA            MEM_DATA_TBS   
+--STANDALONE  SYS       OPEN        TEMPORARY       MEM_TEMP_TBS   
+--STANDALONE  TEST      OPEN        DATA            MEM_DATA_TBS   
+--STANDALONE  TEST      OPEN        TEMPORARY       MEM_TEMP_TBS   
+--######################################################################################
+
 DROP VIEW IF EXISTS PERFORMANCE_VIEW_SCHEMA.TECH_USER;
 
 CREATE VIEW PERFORMANCE_VIEW_SCHEMA.TECH_USER
