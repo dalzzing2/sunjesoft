@@ -1,3 +1,27 @@
+--######################################################################################
+-- View For Sequence
+--
+-- MEMBER_NAME    : Cluster Member Name
+-- OWNER          : Owner
+-- SEQ_NAME       : Sequence Name
+-- LOC_CURR_VALUE : Current Value In Local
+-- LOC_NEXT_VALUE : Next Value In Local
+-- GLO_NEXT_VALUE : Next Value In Cluster
+-- INCREMENT      : Increment
+-- MINVALUE       : Min Value
+-- MAXVALUE       : Max Value
+--
+--gSQL> SELECT * FROM TECH_SEQUENCE;
+--
+--MEMBER_NAME OWNER SEQ_NAME LOC_CURR_VALUE LOC_NEXT_VALUE GLO_NEXT_VALUE INCREMENT MINVALUE            MAXVALUE
+------------- ----- -------- -------------- -------------- -------------- --------- -------- -------------------
+--G1N1        TEST  SEQ1                  4              5             21         1        1 9223372036854775807
+--G1N1        TEST  SEQ2                  1              1              1         1        1 9223372036854775807
+--G2N1        TEST  SEQ1                  1              1             21         1        1 9223372036854775807
+--G2N1        TEST  SEQ2                  1              1              1         1        1 9223372036854775807
+--######################################################################################
+
+
 DROP VIEW IF EXISTS PERFORMANCE_VIEW_SCHEMA.TECH_SEQUENCE;
 
 CREATE VIEW PERFORMANCE_VIEW_SCHEMA.TECH_SEQUENCE
