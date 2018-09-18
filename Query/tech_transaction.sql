@@ -1,3 +1,23 @@
+--######################################################################################
+-- View For Transaction
+--
+-- MEMBER_NAME     : Cluster Member Name
+-- USER_NAME       : User Name
+-- USER_ID         : Session Identifier
+-- USER_SERIAL     : Session Serial
+-- CHARSET         : Session Charset
+-- PROGRAM         : Program Name
+-- USER_LOGIN_TIME : User Login Time
+-- TRANSACTION_ID  : Transaction Identifier
+-- TRAN_BEGIN_TIME : Transaction Begin Time
+--
+--gSQL> SELECT * FROM TECH_TRANSACTION;
+--
+--MEMBER_NAME USER_NAME USER_ID USER_SERIAL CHARSET PROGRAM USER_LOGIN_TIME            TRANSACTION_ID TRAN_BEGIN_TIME           
+------------- --------- ------- ----------- ------- ------- -------------------------- -------------- --------------------------
+--G1N1        SYS             4           1 UTF8    gsql    2018-08-08 15:26:42.502763       33292292 2018-08-08 15:55:23.107324
+--######################################################################################
+
 DROP VIEW IF EXISTS PERFORMANCE_VIEW_SCHEMA.TECH_TRANSACTION;
 
 CREATE VIEW PERFORMANCE_VIEW_SCHEMA.TECH_TRANSACTION
