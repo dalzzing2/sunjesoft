@@ -1,3 +1,23 @@
+--######################################################################################
+-- View For Tablespace
+--
+-- CLUSTER_NAME    : Cluster Member Name
+-- TABLESPACE_NAME : Tablespace Name
+-- TOTAL_MEGABYTE  : Total MegaByte Size
+-- USED_MEGABYTE   : Used MegaByte Size
+-- FREE_MEGABYTE   : Available MegaByte Size
+-- FREE_PERCENTAGE : Available Percent
+--
+--GSQL> SELECT * FROM TECH_TABLESPACE;
+--
+--CLUSTER_NAME TABLESPACE_NAME TOTAL_MEGABYTE USED_MEGABYTE FREE_MEGABYTE FREE_PERCENTAGE
+-------------- --------------- -------------- ------------- ------------- ---------------
+--STANDALONE   DICTIONARY_TBS          256.00         80.31        175.68           68.62
+--STANDALONE   MEM_DATA_TBS             32.00          8.25         23.75           74.21
+--STANDALONE   MEM_TEMP_TBS             32.00          2.50         29.50           92.18
+--STANDALONE   MEM_UNDO_TBS             32.00         16.00         16.00           50.00
+--######################################################################################
+
 DROP VIEW IF EXISTS PERFORMANCE_VIEW_SCHEMA.TECH_TABLESPACE;
 
 CREATE VIEW PERFORMANCE_VIEW_SCHEMA.TECH_TABLESPACE
