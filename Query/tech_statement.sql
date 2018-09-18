@@ -1,3 +1,23 @@
+--######################################################################################
+-- View For Statement
+--
+-- MEMBER_NAME     : Cluster Member Name
+-- STAT_BEGIN_TIME : Begin Time of Statement
+-- USER_NAME       : User Name
+-- USER_ID         : Session Identifier
+-- USER_SERIAL     : Session Serial
+-- CHARSET         : Session Charset
+-- PROGRAM         : Program Name
+-- USER_LOGIN_TIME : User Login Time
+-- SQL_TEXT        : SQL Text
+--
+--gSQL> SELECT * FROM TECH_STATEMENT;
+--
+--MEMBER_NAME STAT_BEGIN_TIME            USER_NAME USER_ID USER_SERIAL CHARSET PROGRAM USER_LOGIN_TIME            SQL_TEXT                    
+------------- -------------------------- --------- ------- ----------- ------- ------- -------------------------- ----------------------------
+--G1N1        2018-08-08 16:38:08.427307 SYS             4           1 UTF8    gsql    2018-08-08 15:26:42.502763 SELECT * FROM TECH_STATEMENT
+--######################################################################################
+
 DROP VIEW IF EXISTS PERFORMANCE_VIEW_SCHEMA.TECH_STATEMENT;
 
 CREATE VIEW PERFORMANCE_VIEW_SCHEMA.TECH_STATEMENT
