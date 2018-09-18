@@ -1,0 +1,53 @@
+--######################################################################################
+-- View For PL/SQL
+--
+-- OWNER         : Owner
+-- SCHEMA_NAME   : Schema Name of PL/SQL
+-- PLSQL_NAME    : PL/SQL Name
+-- PLSQL_TYPE    : PL/SQL Type
+-- PARAM_MODE    : Parameter Mode
+-- PARAM_NAME    : Parameter Name
+-- DATA_TYPE     : Parameter Data Type
+--
+--gSQL> SELECT * FROM TECH_PLSQL;
+--
+--OWNER SCHEMA_NAME PLSQL_NAME     PLSQL_TYPE PARAM_MODE PARAM_NAME   DATA_TYPE        
+------- ----------- -------------- ---------- ---------- ------------ -----------------
+--SYS   PUBLIC      TISTORY2       PROCEDURE  IN         NUM          NUMBER           
+--SYS   PUBLIC      TISTORY2       PROCEDURE  IN         NUM2         NUMBER           
+--SYS   PUBLIC      TOTALCUSTOMERS FUNCTION   OUT        RETURN_VALUE NUMBER           
+--TEST  PUBLIC      TISTORY        FUNCTION   OUT        RETURN_VALUE CHARACTER VARYING
+--######################################################################################
+
+DROP VIEW IF EXISTS PERFORMANCE_VIEW_SCHEMA.TECH_PLSQL;
+
+CREATE VIEW PERFORMANCE_VIEW_SCHEMA.TECH_PLSQL
+(
+  OWNER,
+  SCHEMA_NAME,
+  PLSQL_NAME,
+  PLSQL_TYPE,
+  PARAM_MODE,
+  PARAM_NAME,
+  DATA_TYPE
+)
+AS
+SELECT
+  DP.OWNER,
+  DP.SCHEMA_NAME,
+  DP.OBJECT_NAME,
+  DP.OBJECT_TYPE,
+  DPC.PARAMETER_MODE,
+  DPC.PARAMETER_NAME,
+  DPC.DATA_TYPE
+FROM
+  DBA_PROCEDURES@LOCAL DP,
+  DBC_PROCEDURE_COLUMNS@LOCAL DPC
+WHERE
+  1 = 1
+  AND DP.SCHEMA_NAME = DPC.SPECIFIC_SCHEMA
+  AND DP.OBJECT_NAME = DPC.SPECIFIC_NAME
+ORDER BY DP.OWNER, DP.SCHEMA_NAME, DP.OBJECT_NAME, DPC.ORDINAL_POSITION;
+;
+
+GRANT SELECT ON TABLE PERFORMANCE_VIEW_SCHEMA.TECH_PLSQL TO PUBLIC;
