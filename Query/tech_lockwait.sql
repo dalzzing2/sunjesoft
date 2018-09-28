@@ -41,7 +41,7 @@ SELECT
   'ALTER SYSTEM DISCONNECT SESSION ' || XS.ID || ', ' || XS.SERIAL || CASE NVL(XS.CLUSTER_MEMBER_NAME, 'STANDALONE') 
                                                                            WHEN 'STANDALONE' THEN ';'
                                                                            ELSE CONCAT(CONCAT(' AT ', XS.CLUSTER_MEMBER_NAME), ';')
-                                                                    END AS DISCONNECT_SQL
+                                                                      END AS DISCONNECT_SQL
 FROM
   X$SESSION XS,
   CATALOG_NAME@LOCAL CN
@@ -78,7 +78,7 @@ SELECT
   'ALTER SYSTEM DISCONNECT SESSION ' || XS.ID || ', ' || XS.SERIAL || CASE NVL(XS.CLUSTER_MEMBER_NAME, 'STANDALONE') 
                                                                            WHEN 'STANDALONE' THEN ';'
                                                                            ELSE CONCAT(CONCAT(' AT ', XS.CLUSTER_MEMBER_NAME), ';')
-                                                                    END AS DISCONNECT_SQL
+                                                                      END AS DISCONNECT_SQL
 FROM
   X$SESSION XS,
   X$LOCK_WAIT XLW,
