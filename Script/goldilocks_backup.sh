@@ -24,9 +24,9 @@ help() {
     echo ""
     echo "options:"
     echo "    -h         Print Help Messages"
-    echo "    -m [i|h|c] Set Backup Mode               (Default : h) [ ONLINE : Incremental (i), Full (h) ][ OFFLINE : Full (c) ]"
+    echo "    -m [i|h|c] Set Backup Mode                    (Default : h)  [ ONLINE : Incremental (i), Full (h) ] [ OFFLINE : Full (c) ]"
     echo "    -l LEVEL   Set Level of Incremental Backup    (Default : 0)"
-    echo "    -p PATH    Set Absolute Destination Path (Default : current path)"
+    echo "    -p PATH    Set Absolute Destination Path      (Default : current path)"
     exit 0
 }
 
