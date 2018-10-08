@@ -33,9 +33,9 @@ arguments:
 
 options:
     -h         Print Help Messages
-    -m [i|h|c] Set Backup Mode               (Default : h) [ ONLINE : Incremental (i), Full (h) ][ OFFLINE : Full (c) ]
+    -m [i|h|c] Set Backup Mode                    (Default : h)  [ ONLINE : Incremental (i), Full (h) ] [ OFFLINE : Full (c) ]
     -l LEVEL   Set Level of Incremental Backup    (Default : 0)
-    -p PATH    Set Absolute Destination Path (Default : current path)
+    -p PATH    Set Absolute Destination Path      (Default : current path)
 	
 -m 옵션이 부여되지 않을 시 온라인 핫 백업
 -l 옵션은 -m 의 옵션이 i 인 경우에만 적용됨
