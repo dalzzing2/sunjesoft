@@ -216,6 +216,43 @@ EOF
 fi
 }
 
+function Chk_EndBackup2
+{
+while true;                                                                                                                  
+do                                                                                                                           
+  db_ebackup=`Chk_EndBackup`                                                                                                 
+  db_ebackup=`echo ${db_ebackup} | sed 's/\n//g'`                                                                            
+  if [[ "${db_ebackup}" == *"Database altered."* ]] || [[ "${db_ebackup}" == *"ERR-HY000(14080): cannot end backup; database is not in backup"* ]]                                                                                                          
+  then                                                                                                                       
+    if [[ ${db_name} == "STANDALONE" ]]
+    then
+      Logging "${info}" "ALTER DATABASE END BACKUP"
+      Logging "${info}" "${db_ebackup}"                                                                                         
+    else
+      Logging "${info}" "ALTER DATABASE END BACKUP AT ${db_name}"                                                               
+      Logging "${info}" "${db_ebackup}"                                                                                         
+    fi
+    break;                                                                                                                    
+  else                                                                                                                       
+    if [[ ${db_name} == "STANDALONE" ]]
+    then
+      Logging "${info}" "ALTER DATABASE END BACKUP"
+      Logging "${fatal}" "${db_ebackup}"                                                                                        
+    else
+      Logging "${info}" "ALTER DATABASE END BACKUP AT ${db_name}"                                                               
+      Logging "${fatal}" "${db_ebackup}"                                                                                        
+    fi
+    sleep 1                                                                                                                   
+  fi                                                                                                                         
+done                                                                                                                         
+if [[ "${db_ebackup}" == *"Database altered."* ]]  
+then                                               
+  Logging "${info}" "Backup Success."              
+else                                               
+  Logging "${fatal}" "Backup Failure."             
+fi                          
+}
+
 function Chk_Hot_DBFile
 {
 $session << EOF
@@ -233,7 +270,7 @@ $session << EOF
 set linesize 1024
 set pagesize 10000
 set timing off
-SELECT '@' || FILE_NAME AS CHK FROM V\$DB_FILE WHERE FILE_TYPE = 'Redo Log File' UNION ALL SELECT '@' || VP.PROPERTY_VALUE || '/' || VI.BACKUP_NAME AS CHK FROM V\$PROPERTY VP, V\$INCREMENTAL_BACKUP VI WHERE VP.PROPERTY_NAME = 'BACKUP_DIR_1';
+SELECT '@' || FILE_NAME AS CHK FROM V\$DB_FILE WHERE FILE_TYPE IN ('Redo Log File', 'Config File', 'Trace Log File') UNION ALL SELECT '@' || VP.PROPERTY_VALUE || '/' || VI.BACKUP_NAME AS CHK FROM V\$PROPERTY VP, V\$INCREMENTAL_BACKUP VI WHERE VP.PROPERTY_NAME = 'BACKUP_DIR_1';
 EOF
 }
 
@@ -350,6 +387,8 @@ done
 # main
 ##################################################################
 # 백업 프로세스가 실행중인지 체크
+echo "" >> goldilocks_backup.log
+sleep 1
 pline=`ps -ef | grep "goldilocks_backup.sh" | grep -v "grep" | grep -v "$$" | wc -l`
 if [[ $pline -ne 0 ]]
 then
@@ -431,37 +470,4 @@ else
 fi
 
 # 백업모드 OFF
-while true;                                                                                                                  
-do                                                                                                                           
-  db_ebackup=`Chk_EndBackup`                                                                                                 
-  db_ebackup=`echo ${db_ebackup} | sed 's/\n//g'`                                                                            
-  if [[ "${db_ebackup}" == *"Database altered."* ]] || [[ "${db_ebackup}" == *"ERR-HY000(14080): cannot end backup; database 
-is not in backup"* ]]                                                                                                          
-  then                                                                                                                       
-    if [[ ${db_name} == "STANDALONE" ]]
-    then
-      Logging "${info}" "ALTER DATABASE END BACKUP"
-      Logging "${info}" "${db_ebackup}"                                                                                         
-    else
-      Logging "${info}" "ALTER DATABASE END BACKUP AT ${db_name}"                                                               
-      Logging "${info}" "${db_ebackup}"                                                                                         
-    fi
-    break;                                                                                                                    
-  else                                                                                                                       
-    if [[ ${db_name} == "STANDALONE" ]]
-    then
-      Logging "${info}" "ALTER DATABASE END BACKUP"
-      Logging "${fatal}" "${db_ebackup}"                                                                                        
-    else
-      Logging "${info}" "ALTER DATABASE END BACKUP AT ${db_name}"                                                               
-      Logging "${fatal}" "${db_ebackup}"                                                                                        
-    fi
-    sleep 1                                                                                                                   
-  fi                                                                                                                         
-done                                                                                                                         
-if [[ "${db_ebackup}" == *"Database altered."* ]]  
-then                                               
-  Logging "${info}" "Backup Success."              
-else                                               
-  Logging "${fatal}" "Backup Failure."             
-fi                          
+Chk_EndBackup2
