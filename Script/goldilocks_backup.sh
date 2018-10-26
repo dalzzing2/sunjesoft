@@ -1,3 +1,7 @@
+##################################################################
+# goldilocks_backup.sh
+# 증분백업과 온라인핫백업을 수행한다.
+##################################################################
 #!/bin/sh
 
 today=$(date '+%Y%m%d_%H%M%S')
@@ -6,7 +10,7 @@ folder_path=$(dirname "${file_path}")
 backup_folder="${folder_path}/${today}"
 info="[INFORMATION]"
 fatal="[FATAL]      "
-
+log="goldilocks_backup.log"
 
 ##################################################################
 # Opt
@@ -19,12 +23,12 @@ help() {
     echo "  $ sh goldilocks_backup.sh [OPTIONS] user_name password"
     echo ""
     echo "arguments:"
-    echo "    user_name   user name"
-    echo "    password    password"
+    echo "    user_name  user name"
+    echo "    password   password"
     echo ""
     echo "options:"
     echo "    -h         Print Help Messages"
-    echo "    -m [i|h|c] Set Backup Mode                    (Default : h)  [ ONLINE : Incremental (i), Full (h) ] [ OFFLINE : Full (c) ]"
+    echo "    -m [i|h]   Set Backup Mode                    (Default : h)  [ ONLINE : Incremental (i), Full (h) ]"
     echo "    -l LEVEL   Set Level of Incremental Backup    (Default : 0)"
     echo "    -p PATH    Set Absolute Destination Path      (Default : current path)"
     exit 0
@@ -39,8 +43,10 @@ do
           ;;
         l) level=$OPTARG
           ;;
-        h) help ;;
-        ?) help ;;
+        h) help
+           exit 0 ;;
+        ?) help
+           exit 0 ;;
     esac
 done
 
@@ -69,9 +75,27 @@ user_pw=$2
 ##################################################################
 function Chk_argu
 {
+if [[ "${user_id}" == "" ]] || [[ "${user_pw}" == "" ]]
+then
+  help
+  exit 0;
+fi
+
+if [[ "${mode}" == "h" ]] || [[ "${mode}" == "i" ]] || [[ "${mode}" == "c" ]]
+then
+  echo "" >> ${log}
+  Logging "${info}" "[ GOLDILOCKS BACKUP START ]"
+else
+  Logging "${fatal}" "Mode is invalid."
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
+  help
+  exit 0
+fi
+
 if [[ "${user_id}" == "" ]]
 then
   Logging "${fatal}" "UserID is invalid."
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
   help
   exit 0
 fi
@@ -79,6 +103,7 @@ fi
 if [[ "${user_pw}" == "" ]]
 then
   Logging "${fatal}" "UserPW is invalid."
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
   help
   exit 0
 fi
@@ -86,19 +111,10 @@ fi
 if [[ ! -d "${path}" ]]
 then
   Logging "${fatal}" "Path is invalid."
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
   help
   exit 0
 fi
-
-if [[ "${mode}" == "h" ]] || [[ "${mode}" == "i" ]] || [[ "${mode}" == "c" ]]
-then
-  Logging "${info}" "GOLDILOCKS BACKUP START"
-else
-  Logging "${fatal}" "Mode is invalid."
-  help
-  exit 0
-fi
-
 session="gsqlnet ${user_id} ${user_pw} --no-prompt"
 
 Logging "${info}" "START TIME  = ${today}"
@@ -114,7 +130,8 @@ Logging "${info}" "USER ID     = ${user_id}"
 
 function Logging
 {
-  echo "[$(date '+%Y%m%d_%H%M%S')] $1 $2" | tee -a goldilocks_backup.log
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1 $2" | tee -a ${log}
+  #echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1 $2" >> ${log}
 }
 
 function Chk_err
@@ -124,6 +141,7 @@ then
   Logging "${fatal}" "${1}"
   Chk_EndBackup2
   Logging "${fatal}" "Backup Failure."
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
   exit 0
 fi
 }
@@ -218,39 +236,33 @@ fi
 
 function Chk_EndBackup2
 {
-while true;                                                                                                                  
-do                                                                                                                           
-  db_ebackup=`Chk_EndBackup`                                                                                                 
-  db_ebackup=`echo ${db_ebackup} | sed 's/\n//g'`                                                                            
-  if [[ "${db_ebackup}" == *"Database altered."* ]] || [[ "${db_ebackup}" == *"ERR-HY000(14080): cannot end backup; database is not in backup"* ]]                                                                                                          
-  then                                                                                                                       
+while true;
+do
+  db_ebackup=`Chk_EndBackup`
+  db_ebackup=`echo ${db_ebackup} | sed 's/\n//g'`
+  if [[ "${db_ebackup}" == *"Database altered."* ]] || [[ "${db_ebackup}" == *"ERR-HY000(14080): cannot end backup; database is not in backup"* ]]
+  then
     if [[ ${db_name} == "STANDALONE" ]]
     then
       Logging "${info}" "ALTER DATABASE END BACKUP"
-      Logging "${info}" "${db_ebackup}"                                                                                         
+      Logging "${info}" "${db_ebackup}"
     else
-      Logging "${info}" "ALTER DATABASE END BACKUP AT ${db_name}"                                                               
-      Logging "${info}" "${db_ebackup}"                                                                                         
+      Logging "${info}" "ALTER DATABASE END BACKUP AT ${db_name}"
+      Logging "${info}" "${db_ebackup}"
     fi
-    break;                                                                                                                    
-  else                                                                                                                       
+    break;
+  else
     if [[ ${db_name} == "STANDALONE" ]]
     then
       Logging "${info}" "ALTER DATABASE END BACKUP"
-      Logging "${fatal}" "${db_ebackup}"                                                                                        
+      Logging "${fatal}" "${db_ebackup}"
     else
-      Logging "${info}" "ALTER DATABASE END BACKUP AT ${db_name}"                                                               
-      Logging "${fatal}" "${db_ebackup}"                                                                                        
+      Logging "${info}" "ALTER DATABASE END BACKUP AT ${db_name}"
+      Logging "${fatal}" "${db_ebackup}"
     fi
-    sleep 1                                                                                                                   
-  fi                                                                                                                         
-done                                                                                                                         
-if [[ "${db_ebackup}" == *"Database altered."* ]]  
-then                                               
-  Logging "${info}" "Backup Success."              
-else                                               
-  Logging "${fatal}" "Backup Failure."             
-fi                          
+    sleep 1
+  fi
+done
 }
 
 function Chk_Hot_DBFile
@@ -259,7 +271,10 @@ $session << EOF
 set linesize 1024
 set pagesize 10000
 set timing off
-SELECT '@' || FILE_NAME AS CHK FROM V\$DB_FILE;
+SELECT '@' || FILE_NAME AS CHK FROM V\$DB_FILE WHERE FILE_TYPE NOT IN ('Redo Log File')
+UNION ALL SELECT '@' || FILE_NAME AS CHK FROM V\$LOGFILE WHERE GROUP_STATE = 'CURRENT'
+UNION ALL SELECT '@' || PROPERTY_VALUE AS CHK FROM V\$PROPERTY WHERE PROPERTY_NAME = 'LOCATION_FILE'
+UNION ALL SELECT DISTINCT '@' || CONCAT(SUBSTR(FILE_NAME, 1, INSTR(FILE_NAME, '/', -1)), 'commit.log') AS CHK FROM V\$DB_FILE WHERE FILE_TYPE ='Redo Log File';
 quit
 EOF
 }
@@ -270,115 +285,112 @@ $session << EOF
 set linesize 1024
 set pagesize 10000
 set timing off
-SELECT '@' || FILE_NAME AS CHK FROM V\$DB_FILE WHERE FILE_TYPE IN ('Redo Log File', 'Config File', 'Trace Log File') UNION ALL SELECT '@' || VP.PROPERTY_VALUE || '/' || VI.BACKUP_NAME AS CHK FROM V\$PROPERTY VP, V\$INCREMENTAL_BACKUP VI WHERE VP.PROPERTY_NAME = 'BACKUP_DIR_1';
+SELECT '@' || FILE_NAME AS CHK FROM V\$DB_FILE WHERE FILE_TYPE IN ('Config File', 'Trace Log File')
+UNION ALL SELECT '@' || VP.PROPERTY_VALUE || '/' || VI.BACKUP_NAME AS CHK FROM V\$PROPERTY VP, V\$INCREMENTAL_BACKUP VI WHERE VP.PROPERTY_NAME = 'BACKUP_DIR_1'
+UNION ALL SELECT '@' || FILE_NAME AS CHK FROM V\$LOGFILE WHERE GROUP_STATE = 'CURRENT'
+UNION ALL SELECT '@' || PROPERTY_VALUE AS CHK FROM V\$PROPERTY WHERE PROPERTY_NAME = 'LOCATION_FILE'
+UNION ALL SELECT DISTINCT '@' || CONCAT(SUBSTR(FILE_NAME, 1, INSTR(FILE_NAME, '/', -1)), 'commit.log') AS CHK FROM V$\DB_FILE WHERE FILE_TYPE ='Redo Log File' ;
 EOF
 }
 
-
 function Copy
 {
-backup_space=`echo ${path} | df -k | tail -1 | awk '{print $4*1024}'`
-Logging "${info}" "${path} is available size ${backup_space} Bytes"
+backup_space=`df -k ${path} | tail -1 | awk '{print $4*1024}'`
+Logging "${info}" "Physical Free Size is ${backup_space} Bytes"
+#Logging "${info}" "${path} is available size ${backup_space} Bytes"
 
 i=0
+j=0
 each_file_sumsize=0
 
-# mode : h, i  (redo, ctl, dat)
 while [[ "${db_file}" != "" ]]
 do
-  db_file=${db_file#*@}                                                                                                    
-  each_file[$i]=`echo ${db_file} | cut -d'@' -f1 | sed 's/ //g'`                                                            
-                                                                                                                            
-  if [[ -f "${each_file[$i]}" ]]                                                                                             
-  then                                                                                                                       
-    each_file_size=`ls -al ${each_file[$i]} | awk '{print $5}'`                                                              
-    each_file_sumsize=`expr ${each_file_sumsize} + ${each_file_size}`                                                        
-    Logging "${info}" "${each_file[$i]} size is ${each_file_size} Bytes"                                                     
-  fi                                                                                                                         
-                                                                                                                             
-  if [[ "${each_file_sumsize}" -ge "${backup_space}" ]]                                                                      
-  then                                                                                                                       
-    Logging "${fatal}" "Backup Size is greater than ${each_file_sumsize} Bytes. It requires more Available Bytes on disk"    
-    Chk_EndBackup2                                                                                                           
-    Logging "${fatal}" "Backup Failure."                                                                                     
-    exit 0;                                                                                                                  
-  fi                                                                                                                         
-                                                                                                                             
-  if [[ "${db_file}" == ${each_file[$i]} ]]                                                                               
-  then                                                                                                                       
-    break;                                                                                                                   
-  fi                                                                                                                         
-  i=`expr $i + 1`                                                                                                            
+  db_file=${db_file#*@}
+  each_file[$i]=`echo ${db_file} | cut -d'@' -f1 | sed 's/ //g'`
+
+
+  if [[ -f "${each_file[$i]}" ]]
+  then
+    if [[ ! -r "${each_file[$i]}" ]]
+    then
+      echo "${each_file[$i]} Not Readable"
+    fi
+    each_file_size=`ls -al ${each_file[$i]} | awk '{print $5}'`
+    each_file_sumsize=`expr ${each_file_sumsize} + ${each_file_size}`
+    Logging "${info}" "${each_file[$i]} size is ${each_file_size} Bytes"
+  fi
+
+  if [[ "${each_file_sumsize}" -ge "${backup_space}" ]]
+  then
+    Logging "${fatal}" "Backup Size is greater than ${each_file_sumsize} Bytes. It requires more Available Bytes on disk"
+    Chk_EndBackup2
+    Logging "${fatal}" "Backup Failure."
+    Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
+    exit 0;
+  fi
+
+  if [[ "${db_file}" == ${each_file[$i]} ]]
+  then
+    break;
+  fi
+  i=`expr $i + 1`
+  j=`expr $j + 1`
 done
 
-l_state=0
-c_state=0
+to_file="${path}/${today}"
+mkdir -p ${to_file}
+
 while [[ $i -ge 0 ]]
 do
-  location_file="location.ctl"
-  commit_file="commit.log"
-  from_file=`echo "${each_file[$i]}" | sed 's/\/\//\//g'`                                
-  to_file=`echo "${path}/${today}/${from_file%/*}" | sed 's/\/\//\//g'`                  
-                                                                                         
-  if [[ ! -d "${to_file}" ]]                                                             
-  then                                                                                   
-    mkdir -p ${to_file}                                                                  
-  fi                                                                                     
-                                                                                         
-  location_file=${from_file%/*}/${location_file}                                         
-  commit_file=${from_file%/*}/${commit_file}                                             
-                                                                                         
-  if [[ -f "${location_file}" ]] && [[ ${l_state} -eq 0 ]]                                   
-  then                                                                                   
-    cp ${location_file} ${to_file}                                                       
-    if [[ $? -eq 0 ]]                                                                    
-    then                                                                                 
-      Logging "${info}" "From ${location_file} To ${to_file}/${location_file##*/}"       
-      l_state=1                                                                            
-    else                                                                                 
-      Logging "${fatal}" "From ${location_file} To ${to_file}/${location_file##*/}"      
-      Chk_EndBackup2                                                                     
-      Logging "${fatal}" "Backup Failure."                                               
-      exit 0;                                                                            
-    fi                                                                                   
-  fi                                                                                     
+  from_file=`echo "${each_file[$i]}" | sed 's/\/\//\//g'`
 
-  if [[ -f "${commit_file}" ]] && [[ ${c_state} -eq 0 ]]                                      
-  then                                                                                     
-    cp ${commit_file} ${to_file}                                                           
-    if [[ $? -eq 0 ]]                                                                      
-    then                                                                                   
-      Logging "${info}" "From ${commit_file} To ${to_file}/${commit_file##*/}"             
-      c_state=1                                                                             
-    else                                                                                   
-      Logging "${fatal}" "From ${commit_file} To ${to_file}/${commit_file##*/}"            
-      Chk_EndBackup2                                                                       
-      Logging "${fatal}" "Backup Failure."                                                 
-      exit 0;                                                                              
-    fi                                                                                     
-  fi                                                                                       
-                                                                                           
-  if [[ -f "${from_file}" ]]                                                               
-  then                                                                                     
+  if [[ ! -d "${to_file}" ]]
+  then
+    Logging "${fatal}" "Directory Not Exists"
+    Chk_EndBackup2
+    Logging "${fatal}" "Backup Failure."
+    Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
+    exit 0;
+  fi
+
+  if [[ -f "${from_file}" ]]
+  then
+    mkdir -p ${to_file}${from_file%/*}
     if [[ ${from_file##*.} == "inc" ]]
     then
-      mv ${from_file} ${to_file}
+      mv ${from_file} ${to_file}${from_file}
     else
-      cp ${from_file} ${to_file}                                                             
+      cp ${from_file} ${to_file}${from_file}
     fi
-    if [[ $? -eq 0 ]]                                                                      
-    then                                                                                   
-      Logging "${info}" "From ${from_file} To ${to_file}/${from_file##*/}"                 
-    else                                                                                   
-      Logging "${fatal}" "From ${from_file} To ${to_file}/${from_file##*/}"                
-      Chk_EndBackup2                                                                       
-      Logging "${fatal}" "Backup Failure."                                                 
-      exit 0;                                                                              
-    fi                                                                                     
-  fi                                                                                       
-                                                                                           
-  i=`expr $i - 1`                                                                          
+    if [[ $? -eq 0 ]]
+    then
+      Logging "${info}" "From ${from_file} To ${to_file}${from_file}"
+    else
+      Logging "${fatal}" "Copy Failure"
+      Logging "${fatal}" "From ${from_file} To ${to_file}${from_file}"
+      Chk_EndBackup2
+      Logging "${fatal}" "Backup Failure."
+      Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
+      exit 0;
+    fi
+  fi
+  i=`expr $i - 1`
+done
 
+while [[ $j -ge 0 ]]
+do
+  if [[ -f ${each_file[$j]} ]]
+  then
+    if [[ ! -f "${to_file}${each_file[$j]}" ]]
+    then
+      Logging "${fatal}" "${to_file}${each_file[$j]} Not Exists"
+      Chk_EndBackup2
+      Logging "${fatal}" "Backup Failure."
+      Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
+      exit 0;
+    fi
+  fi
+  j=`expr $j - 1`
 done
 }
 
@@ -386,24 +398,25 @@ done
 ##################################################################
 # main
 ##################################################################
+# Argument 체크
+Chk_argu
+
 # 백업 프로세스가 실행중인지 체크
-echo "" >> goldilocks_backup.log
-sleep 1
 pline=`ps -ef | grep "goldilocks_backup.sh" | grep -v "grep" | grep -v "$$" | wc -l`
 if [[ $pline -ne 0 ]]
 then
   Logging "${fatal}" "Goldilocks Backup Script is Already Started"
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
   exit 0;
 fi
 
-# Argument 체크
-Chk_argu
 
 # BACKUP 권한 체크
 db_grant=`Chk_Grant | grep -e "^@" -e "ERR-"`
 if [[ "${db_grant}" == *"ERR-"* ]]
 then
   Logging "${fatal}" "${db_grant}"
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
   exit 0
 fi
 
@@ -412,6 +425,7 @@ db_name=`Chk_DBName | grep -e "^@" -e "ERR-" | cut -d '@' -f2`
 if [[ "${db_name}" == *"ERR-"* ]]
 then
   Logging "${fatal}" "${db_name}"
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
   exit 0
 else
   Logging "${info}" "DB NAME     = ${db_name}"
@@ -430,6 +444,7 @@ then
     Logging "${info}" "ALTER DATABASE BEGIN BACKUP AT ${db_name}"
     Logging "${fatal}" "${db_sbackup}"
   fi
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
   exit 0
 else
   if [[ ${db_name} == "STANDALONE" ]]
@@ -457,17 +472,28 @@ then
 
   db_file=`Chk_Inc_DBFile | grep -e "^@" -e "ERR-" | sed 's/ //g'`
   Chk_err ${db_file0}
-                                                                        
+
   Copy
 elif [[ "${mode}" == "c" ]]
 then
   Logging "${fatal}" "Not Yet Support Mode"
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
   exit 0
 else
   Logging "${fatal}" "Mode is invalid."
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
   help
   exit 0
 fi
 
 # 백업모드 OFF
 Chk_EndBackup2
+
+if [[ "${db_ebackup}" == *"Database altered."* ]]
+then
+  Logging "${info}" "Backup Success."
+  Logging "${info}" "[ GOLDILOCKS BACKUP END ]"
+else
+  Logging "${fatal}" "Backup Failure."
+  Logging "${fatal}" "[ GOLDILOCKS BACKUP END ]"
+fi
