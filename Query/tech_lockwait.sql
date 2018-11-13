@@ -63,7 +63,7 @@ WHERE
                                                                                                                NVL(XLW.CLUSTER_MEMBER_NAME, 'STANDALONE'),
                                                                                                                XLW.GRANTED_TRANSACTION_SLOT_ID
                                                                                                              FROM
-                                                                                                               X$LOCK_WAIT XLW )) XT
+                                                                                                               X$LOCK_WAIT XLW@GLOBAL[IGNORE_INACTIVE_MEMBER] )) XT
                                             WHERE
                                               CM.MEMBER_POSITION = XT.DRIVER_MEMBER_POS)
 UNION ALL
