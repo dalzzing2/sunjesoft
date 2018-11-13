@@ -43,8 +43,8 @@ SELECT
                                                                            ELSE CONCAT(CONCAT(' AT ', XS.CLUSTER_MEMBER_NAME), ';')
                                                                       END AS DISCONNECT_SQL
 FROM
-  X$SESSION XS,
-  CATALOG_NAME@LOCAL CN
+  X$SESSION@GLOBAL[IGNORE_INACTIVE_MEMBER] XS,
+  CATALOG_NAME@LOCAL[IGNORE_INACTIVE_MEMBER] CN
 WHERE
   1 = 1 AND
   CN.IS_CLUSTER = TRUE AND
@@ -52,12 +52,12 @@ WHERE
                                               CM.MEMBER_NAME,
                                               XT.DRIVER_TRANS_ID
                                             FROM
-                                              CLUSTER_MEMBER@LOCAL CM,
+                                              CLUSTER_MEMBER@LOCAL[IGNORE_INACTIVE_MEMBER] CM,
                                               (SELECT
                                                  XT.DRIVER_MEMBER_POS DRIVER_MEMBER_POS,
                                                  XT.DRIVER_TRANS_ID DRIVER_TRANS_ID
                                                FROM
-                                                 X$TRANSACTION XT
+                                                 X$TRANSACTION@GLOBAL[IGNORE_INACTIVE_MEMBER] XT
                                                WHERE
                                                  (NVL(XT.CLUSTER_MEMBER_NAME, 'STANDALONE'), XT.SLOT_ID) IN (SELECT
                                                                                                                NVL(XLW.CLUSTER_MEMBER_NAME, 'STANDALONE'),
@@ -80,9 +80,9 @@ SELECT
                                                                            ELSE CONCAT(CONCAT(' AT ', XS.CLUSTER_MEMBER_NAME), ';')
                                                                       END AS DISCONNECT_SQL
 FROM
-  X$SESSION XS,
-  X$LOCK_WAIT XLW,
-  CATALOG_NAME@LOCAL CN
+  X$SESSION@GLOBAL[IGNORE_INACTIVE_MEMBER] XS,
+  X$LOCK_WAIT@GLOBAL[IGNORE_INACTIVE_MEMBER] XLW,
+  CATALOG_NAME@LOCAL[IGNORE_INACTIVE_MEMBER] CN
 WHERE
   1 = 1 AND
   CN.IS_CLUSTER = FALSE AND
